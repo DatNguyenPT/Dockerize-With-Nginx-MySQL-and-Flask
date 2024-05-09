@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  flask:
+    container_name: flask
+    image: dockerhub-flask_live_app:1.0.0
+    build: ./flask
+    ports:
+      - "5000:5000"
+    expose:
+      - 8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    container_name: mysql
+    image: mysql:latest
+    ports:
+      - "3307:3306" 
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  nginx: 
+        image: nginx:latest
+        build: ./nginx
+        depends_on:
+        - flask
+        ports:
+        - "8080:80"
+
+

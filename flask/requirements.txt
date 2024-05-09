@@ -1,0 +1,2 @@
+Flask-SQLAlchemy # ORM to query the database
+Flask # Framework
