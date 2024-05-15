@@ -5,35 +5,30 @@ from os import environ
 
 
 # Create db outside of the app
-db = SQLAlchemy()
 
-def create_app():
-    app = Flask(__name__)
 
-    # /// = relative path, //// = absolute path
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqlite"
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
 
-    # Set secret key
-    app.secret_key = 'dockerproject'
+# Set secret key
+app.secret_key = 'dockerproject'
 
-    # Initialize db within the app
-    db.init_app(app)
-
-    return app
-
-# Initialize the app
-app = create_app()
+db = SQLAlchemy(app)
 
 class Todo(db.Model):
+    __tablename__='Todo'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
 
 class User(db.Model):
+    __tablename__='User'
     username = db.Column(db.String(100), primary_key=True)
     password = db.Column(db.String(100))
 
+with app.app_context():
+    # Create tables
+    db.create_all()
 
 @app.route("/")
 def account():
@@ -103,6 +98,4 @@ def delete(todo_id):
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-
+    app.run(debug=True)

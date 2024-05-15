@@ -1,2 +1,3 @@
-Flask-SQLAlchemy # ORM to query the database
-Flask # Framework
+flask
+psycopg2-binary
+Flask-SQLAlchemy
