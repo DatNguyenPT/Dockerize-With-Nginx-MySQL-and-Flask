@@ -1,34 +1,46 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from prometheus_flask_exporter import PrometheusMetrics
 from os import environ
 
-
-# Create db outside of the app
-
-
+# Create the Flask application
 app = Flask(__name__)
+
+# Initialize Prometheus metrics
+metrics = PrometheusMetrics(app)
+
+# Configure the database URI
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
 
-# Set secret key
+# Set the secret key for session management
 app.secret_key = 'dockerproject'
 
+# Initialize the SQLAlchemy database
 db = SQLAlchemy(app)
 
+# Define the Todo model
 class Todo(db.Model):
     __tablename__='Todo'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     complete = db.Column(db.Boolean)
 
+# Define the User model
 class User(db.Model):
     __tablename__='User'
     username = db.Column(db.String(100), primary_key=True)
     password = db.Column(db.String(100))
 
+# Create the database tables
 with app.app_context():
-    # Create tables
     db.create_all()
+
+# Define the routes
+
+# @app.route("/metrics")
+# def custom_metrics():
+#     return metrics.export()
 
 @app.route("/")
 def account():
@@ -97,5 +109,7 @@ def delete(todo_id):
     db.session.commit()
     return redirect(url_for("home"))
 
+
+# Run the Flask application
 if __name__ == "__main__":
     app.run(debug=True)

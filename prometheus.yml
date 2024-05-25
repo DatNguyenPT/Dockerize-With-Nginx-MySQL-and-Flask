@@ -1,0 +1,11 @@
+global:
+  scrape_interval:     15s
+
+scrape_configs:
+  - job_name: 'flask'
+    static_configs:
+      - targets: ['flask1:5000', 'flask2:5000', 'flask3:5000', 'flask4:5000', 'flask5:5000']
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:80']

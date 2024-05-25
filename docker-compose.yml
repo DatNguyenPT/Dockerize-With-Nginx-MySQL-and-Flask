@@ -1,17 +1,75 @@
 version: "3.9"
 
 services:
-  flask:
-    container_name: flask
+  flask1:
+    container_name: flask1
     image: dockerhub-flask_live_app:1.0.0
-    build: ./flask
     ports:
-      - "5000:5000"
+      - "5001:5000"
     environment:
       - DB_URL=postgresql://postgres:postgres@postgres_db:5432/postgres
     depends_on:
-      postgres_db:
-        condition: service_healthy
+      - postgres_db
+
+  flask2:
+    container_name: flask2
+    image: dockerhub-flask_live_app:1.0.0
+    ports:
+      - "5002:5000"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@postgres_db:5432/postgres
+    depends_on:
+      - postgres_db
+
+  flask3:
+    container_name: flask3
+    image: dockerhub-flask_live_app:1.0.0
+    ports:
+      - "5003:5000"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@postgres_db:5432/postgres
+    depends_on:
+      - postgres_db
+
+  flask4:
+    container_name: flask4
+    image: dockerhub-flask_live_app:1.0.0
+    ports:
+      - "5004:5000"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@postgres_db:5432/postgres
+    depends_on:
+      - postgres_db
+
+  flask5:
+    container_name: flask5
+    image: dockerhub-flask_live_app:1.0.0
+    ports:
+      - "5005:5000"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@postgres_db:5432/postgres
+    depends_on:
+      - postgres_db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - flask1
+      - flask2
+      - flask3
+      - flask4
+      - flask5
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
   postgres_db:
     container_name: postgres_db
@@ -28,11 +86,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-  nginx:
-    image: nginx:latest
-    build: ./nginx
-    depends_on:
-      - flask
-    ports:
-      - "8080:80"
+volumes:
+  postgres_data:
